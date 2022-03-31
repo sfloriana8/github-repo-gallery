@@ -3,6 +3,7 @@
 
 const overview = document.querySelector(".overview");
 const username = 'sfloriana8';
+const repoList = document.querySelector(".repo-list");
 
 //Fetch API JSON data
 const gitUserInfo= async function() {
@@ -29,4 +30,24 @@ const displayUserInfo = function (data){
     </div> 
     `;
 overview.append(div);
+fetchRepos();
 };
+
+//Fetching Repos
+
+const fetchRepos = async function () {
+    const showRepos = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+    const data = await showRepos.json();
+    //console.log(data);
+    displayRepo(data);
+};
+
+
+const displayRepo = function (repos) {
+for (const repo of repos) {
+    repoItem = document.createElement("li");
+    repoItem.classList.add("repo");repoItem.innerHTML = `<h3>${repo.name}</h3>`;
+    repoList.append(repoItem);
+}
+};
+
