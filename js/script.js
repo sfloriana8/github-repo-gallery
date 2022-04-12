@@ -4,11 +4,13 @@
 const overview = document.querySelector(".overview");
 const username = 'sfloriana8';
 const repoList = document.querySelector(".repo-list");
+const allReposContainer = document.querySelector(".repos");
+const repoData = document.querySelector(".repo-data");
 
 //Fetch API JSON data
 const gitUserInfo= async function() {
-    const getUsername = await fetch(`https://api.github.com/users/${username}`);
-    const data = await getUsername.json();
+    const userInfo = await fetch(`https://api.github.com/users/${username}`);
+    const data = await userInfo.json();
     displayUserInfo(data);
 };
 
@@ -30,24 +32,60 @@ const displayUserInfo = function (data){
     </div> 
     `;
 overview.append(div);
-fetchRepos();
+gitRepos();
 };
 
 //Fetching Repos
 
-const fetchRepos = async function () {
-    const showRepos = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
-    const data = await showRepos.json();
+const gitRepos = async function () {
+    const fetchRepos = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+    const data = await fetchRepos.json();
     //console.log(data);
-    displayRepo(data);
+    displayRepos(data);
 };
 
 
-const displayRepo = function (repos) {
+const displayRepos = function (repos) {
 for (const repo of repos) {
-    repoItem = document.createElement("li");
-    repoItem.classList.add("repo");repoItem.innerHTML = `<h3>${repo.name}</h3>`;
+    const repoItem = document.createElement("li");
+    repoItem.classList.add("repo");
+    repoItem.innerHTML = `<h3>${repo.name}</h3>`;
     repoList.append(repoItem);
 }
 };
 
+repoList.addEventListener("click", function (e) {
+    if (e.target.matches("h3")){
+        const repoName = e.target.innerText;
+        getRepoInfo(repoName);
+    }
+});
+
+const getRepoInfo = async function (repoName){
+    const fetchInfo = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
+    const repoInfo = await fetchInfo.json(); 
+    console.log(repoInfo);
+    const fetchLanguages = await fetch(repoInfo.languages_url);
+    const languageData = await fetchLanguages.json();
+    //console.log(languageData);    
+    const languages = [];
+    for (const language in languageData){
+    languages.push(language);
+}
+displayRepoInfo(repoInfo, languages);
+};
+
+const displayRepoInfo = function(repoInfo, languages){
+    repoData.innerHTML= '';
+    repoData.classList.remove("hide");
+    allReposContainer.classList.add("hide");
+    const div = document.createElement("div");
+    div.innerHTML = `
+    <h3> Name: ${repoInfo.name}</h3>
+    <p>Description: ${repoInfo.description}</p>
+    <p>Default Branch: ${repoInfo.default_branch} </p>
+    <p> Languages: ${languages.join(", ")}</p>
+    <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>
+    `;
+repoData.append(div);
+};
