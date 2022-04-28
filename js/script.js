@@ -6,6 +6,8 @@ const username = 'sfloriana8';
 const repoList = document.querySelector(".repo-list");
 const allReposContainer = document.querySelector(".repos");
 const repoData = document.querySelector(".repo-data");
+const backButton =document.querySelector(".view-repos");
+const filterInput = document.querySelector(".filter-repos");
 
 //Fetch API JSON data
 const gitUserInfo= async function() {
@@ -32,20 +34,21 @@ const displayUserInfo = function (data){
     </div> 
     `;
 overview.append(div);
-gitRepos();
+gitRepos(username);
 };
 
 //Fetching Repos
 
-const gitRepos = async function () {
+const gitRepos = async function (username) {
     const fetchRepos = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
-    const data = await fetchRepos.json();
+    const repoData = await fetchRepos.json();
     //console.log(data);
-    displayRepos(data);
+    displayRepos(repoData);
 };
 
 
 const displayRepos = function (repos) {
+    filterInput.classList.remove("show");
 for (const repo of repos) {
     const repoItem = document.createElement("li");
     repoItem.classList.add("repo");
@@ -76,6 +79,7 @@ displayRepoInfo(repoInfo, languages);
 };
 
 const displayRepoInfo = function(repoInfo, languages){
+    backButton.classList.remove("hide");
     repoData.innerHTML= '';
     repoData.classList.remove("hide");
     allReposContainer.classList.add("hide");
@@ -89,3 +93,27 @@ const displayRepoInfo = function(repoInfo, languages){
     `;
 repoData.append(div);
 };
+
+//Adding Click Event to Back Button
+backButton.addEventListener("click", function(){
+    allReposContainer.classList.remove("hide");
+    repoData.classList.add("hide");
+    backButton.classList.add("hide");
+
+});
+
+// filterInput.addEventListener("input", function(e){
+//     const searchInput = e.target.value;
+//     const repos = document.querySelector(".repo");
+//     const lowercaseText = searchText.toLowerCase();
+
+//     for (const repo of repos){
+//         const repoLowerText = repo.innerText.toLowerCase();
+//         if (repoLowerText.includes(lowercaseText)){
+//             repo.classList.remove("hide");
+//         } else {
+//             repo.classList.add("hide");
+//         }
+//     }
+
+// });
